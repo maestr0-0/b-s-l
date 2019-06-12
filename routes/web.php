@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,3 +17,16 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+//Routes for authentication
+Auth::routes();
+Route::get('/logout', 'Auth\LoginController@logout')->name('logout');
+// When user will sign up, it will redirect to needed dashboard, it depends on the role .. !
+Route::group(['middleware' => 'auth', 'namespace' => 'Home'], function () {
+    Route::get('/home', 'HomeController@index')->name('home');
+});
+
+Route::group(['prefix' => 'admin','namespace' => 'Admin', 'middleware' => ['role:admin']], function() {
+    Route::resource('dashboard', 'DashboardController');
+});
+
